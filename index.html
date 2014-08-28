@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        background: #444;
+      }
+
+      .container {
+        width: 100%;
+      }
+
+      .game-container {
+        width: 800px;
+        height: 450px;
+        margin: 100px auto;
+        position:relative;
+      }
+
+      #world {
+        border: 6px solid #FEFEFE;
+        width: 800px;
+        height: 450px;
+        background: #74B4DF;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      #dirt {
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+        background: rgba(153,107,73,1);
+        border: 2px solid #112233;
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 10;
+      }
+
+      #dirt-num {
+        position: absolute;
+        right: 5px;
+        bottom:5px;
+        color: #FEFEFE;
+        font-family: arial;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='game-container'>
+        <div id='dirt'><div id='dirt-num'>0</div></div>
+        <canvas id='world' width='800' height='450'></canvas>
+      </div>
+    </div>
+
+    <script>var $ = {};</script>
+    <script src='js/utils.js'></script>
+    <script src='js/hero.js'></script>
+    <script src='js/particle.js'></script>
+    <script src='js/tile.js'></script>
+    <script src='js/camera.js'></script>
+    <script src='js/game.js'></script>
+    <script src='js/world.js'></script>
+    <script src='js/index.js'></script>
+  </body>
+</html>
