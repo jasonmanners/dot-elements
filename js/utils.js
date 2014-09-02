@@ -35,10 +35,42 @@ $.utils = {
     return arr[Math.floor(Math.random()*arr.length)];
   },
 
+  getRandomIndex : function(arr) {
+    return Math.floor(Math.random()*arr.length);
+  },
+
   toIndex : function(num, size) {
     return Math.floor(num / size);
+  },
+
+  deepCopy : function(obj) {
+    return JSON.parse(JSON.stringify(obj));
   }
 };
+
+$.render = {
+  fillCircle : function(ctx, pos, radius, color) {
+    ctx.save();
+      ctx.fillStyle = $.utils.colorString(color.r, color.g, color.b, color.a);
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, radius, 0 , 2 * Math.PI, false);
+      ctx.closePath();
+      ctx.fill();
+    ctx.restore();
+  },
+
+  strokeCircle : function(ctx, pos, radius, line, color) {
+    ctx.save();
+      ctx.strokeStyle = $.utils.colorString(color.r, color.g, color.b, color.a);
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, radius, 0 , 2 * Math.PI, false);
+      ctx.closePath();
+      ctx.lineWidth = line;
+      ctx.stroke();
+    ctx.restore();
+  },
+
+}
 
 $.const = {
   NUM_SEEDS : 3,

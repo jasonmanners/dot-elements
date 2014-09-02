@@ -10,3 +10,12 @@ gulp.task('compress', function() {
     .pipe(uglify())
     .pipe(gulp.dest('./dist/'))
 });
+
+
+gulp.task('test', function() {
+  gulp.src('./poc/fluid.js')
+    .pipe(concat('fluid.js'))
+    .pipe(gulp.dest('./dist/'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist/'))
+});

@@ -109,6 +109,21 @@ $.Tile = {
     return canvas;
   },
 
+  generateWater : function(w,h) {
+    var canvas  = document.createElement("canvas"),
+        ctx     = canvas.getContext("2d");
+
+    canvas.width  = w;
+    canvas.height = h;
+    
+
+    ctx.save();
+      ctx.fillStyle = $.utils.colorString(0, 0, 255, 0.3);
+      ctx.fillRect(0,0,w,h);
+    ctx.restore();
+
+    return canvas;
+  }
 };
 
 
@@ -116,6 +131,7 @@ $.Tile.Dirt = function(pos){
   this.pos      = pos;
   this.image    = $.utils.getRandom($.Tile.images.dirt);
   this.particle = new $.Particle(pos,this.image);
+  this.solid    = true;
 };
 
 $.Tile.Dirt.prototype = {
@@ -123,3 +139,17 @@ $.Tile.Dirt.prototype = {
     this.particle.draw(ctx, image);
   }
 };
+
+
+// $.Tile.Water = function(pos){
+//   this.pos      = pos;
+//   this.image    = $.utils.getRandom($.Tile.images.dirt);
+//   this.particle = new $.Particle(pos,this.image);
+//   this.solid    = true;
+// };
+
+// $.Tile.Dirt.prototype = {
+//   draw : function(ctx, image) {
+//     this.particle.draw(ctx, image);
+//   }
+// };

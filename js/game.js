@@ -1,10 +1,9 @@
 $.Game = function() {
-  this.hero     = null;
-  this.running  = false;
-  this.canvas   = null;
-  this.context  = null;
-
-  this.init();
+  this.hero       = null;
+  this.running    = false;
+  this.canvas     = null;
+  this.context    = null;
+  this.particles  = null;
 
   this.width = 800;
   this.height = 450;
@@ -18,7 +17,18 @@ $.Game = function() {
   this.mouse = {
     x : 0,
     y : 0
-  }
+  };
+
+  this.shrines = {
+    'water' : null,
+    'earth' : null,
+    'fire'  : null,
+    'air'   : null
+  };
+
+  this.enemies = [];
+
+  this.init();
 };
 
 $.Game.prototype = {
@@ -28,6 +38,8 @@ $.Game.prototype = {
     this.initCanvas();
     this.initKeybindings();
     this.initMouse();
+    this.initParticleEmitter();
+    this.initShrines();
   },
   
   initObjects : function() {
@@ -38,8 +50,9 @@ $.Game.prototype = {
     this.camera = new $.Camera();
     this.camera.offset.x = 1000;
     this.hero.pos.x = 1500;
+    this.hero.pos.y = 100;
     this.camera.viewWidth = 800;
-    this.camera.gutter = 100;
+    this.camera.gutter = 150;
   },
 
   initCanvas : function() {
@@ -47,10 +60,26 @@ $.Game.prototype = {
     this.context  = this.canvas.getContext('2d');
   },
 
+  initParticleEmitter : function() {
+    this.particles = $.ParticleEmitter;
+  },
+
+  initShrines : function() {
+    var col = $.utils.getRandom(this.world.tiles);
+    for(var i = 0; i < col.length; i++) {
+      if(col[i] && col[i].solid) {
+        var radius = 50;
+        this.shrines.water = new $.Shrine({x:col[i].pos.x,y:col[i].pos.y-radius}, {r:56,g:89,b:200,a:0.8});
+        this.shrines.water.radius = radius;
+        break;
+      }
+    }
+    
+  },
+
   initMouse : function() {
 
     this.canvas.onmousemove = function(e) {
-      console.log(e)
       var rect = this.canvas.getBoundingClientRect();
       // this.mouse.x = e.x - this.canvas.offsetLeft - 5 + this.camera.offset.x;
       this.mouse.x = e.clientX - rect.left - 5 + this.camera.offset.x;
@@ -91,7 +120,7 @@ $.Game.prototype = {
 
     window.onkeydown = function(evt) {
       var key = $.const.KEYS[evt.keyCode] || evt.keyCode;
-      console.log('[KEY PRESSED] {%s : %s}', evt.keyCode, key);
+      // console.log('[KEY PRESSED] {%s : %s}', evt.keyCode, key);
       $.pressed[key] = true;
       if($.keybindings.down[key]) {
         $.keybindings.down[key]();
@@ -110,7 +139,7 @@ $.Game.prototype = {
   handleEvents : function() {
     for(key in $.keybindings) {
       if($.pressed[key]) {
-        console.log('[KEY EVENT] %s', key);
+        // console.log('[KEY EVENT] %s', key);
         $.keybindings[key]();
       }
     }
@@ -123,6 +152,27 @@ $.Game.prototype = {
     }
     this.hero.update(delta);
     this.world.update(delta);
+    this.particles.update(delta);
+
+    for(var i = 0; i < this.enemies.length; i++) {
+      this.enemies[i].update(delta, this.hero);
+    }
+
+    // @TODO: Make Dusk and Dawn
+    if(Math.sin(this.time.total / 10000) > 0 && this.world.isNight()) {
+      this.world.setDay();
+    }
+    else if(Math.sin(this.time.total / 10000) < 0 && this.world.isDay()) {
+      this.world.setNight();
+    }
+
+
+    // @TODO: Make this random
+    if(Math.random()*100 > 98) {
+      var col   = $.utils.getRandomIndex(this.world.tiles),
+          cell  = this.world.findFloor(col);
+      this.enemies.push(new $.Enemy({x: cell.pos.x, y: cell.pos.y-15}));
+    }
   },
 
   collisions : function() {
@@ -133,21 +183,24 @@ $.Game.prototype = {
         numY = 8;
     var xLeft = Math.floor(x / $.const.TILE_SIZE) - 3;
     var yTop = Math.floor(y / $.const.TILE_SIZE) - 4;
-    // console.log()
-    if(xLeft < 0) {
-      xLeft = 0;
-    }
-    if(yTop < 0) {
-      yTop = 0;
-    }
+
+    xLeft = Math.max(0, xLeft);
+    yTop  = Math.max(0, yTop);
 
     var tiles = this.world.tiles;
     for(var i = xLeft; i < xLeft+numX; i++) {
       for(var j = yTop; j < yTop+numY; j++) {
-        if(tiles[i][j] !== null) {
-          this.hero.handleCollision(tiles[i][j].pos, $.const.TILE_SIZE, i, j);
+        if(tiles[i][j] && tiles[i][j].solid) {
+          var col = this.hero.handleCollision(tiles[i][j].pos, $.const.TILE_SIZE, i, j);
         }
       }
+    }
+
+
+    if(this.shrines.water && $.utils.distance(this.shrines.water.pos, this.hero.pos) < this.shrines.water.radius + this.hero.height) {
+      this.hero.shrines++;
+      $.ParticleEmitter.addParticle(this.shrines.water.pos, 200, Math.PI, {r: 255, g: 255, b: 255, a: 0.5});
+      this.shrines.water = null;
     }
 
 
@@ -208,8 +261,15 @@ $.Game.prototype = {
       this.world.drawBackground(this.context,this.width,this.height);
       this.context.translate(-this.camera.offset.x, -this.camera.offset.y);
       this.world.draw(this.context, this.camera);
+      for(var i = 0; i < this.enemies.length; i++) {
+        this.enemies[i].draw(this.context);
+      }
       this.hero.draw(this.context);
+      this.particles.draw(this.context);
 
+      if(this.shrines.water) {
+        this.shrines.water.draw(this.context);
+      }
       if(this.hero.mode !== 0) {
         this.drawMouse(this.context);  
       }
@@ -271,7 +331,8 @@ $.Game.prototype = {
     this.time.last = drawStart;
 
     if(this.hero.win()){
-      alert('You Win!');
+      // alert('You Win!');
+      console.log('You Win!!!!')
     }
 
     this.draw();

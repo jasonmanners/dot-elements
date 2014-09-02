@@ -7,95 +7,27 @@
       }
 
       .container {
-        width: 800px;
+        width: 400px;
         margin: 100px auto;
       }
 
       #world {
         border: 6px solid #FEFEFE;
-        width: 800px;
-        height: 450px;
-        background: #74B4DF;
+        width: 400px;
+        height: 400px;
+        background: #000000;
+        /*background: rgb(83,167,223);*/
       }
     </style>
   </head>
   <body>
     <div class='container'>
-      <canvas id='world' width='800' height='450'></canvas>
+      <canvas id='world' width='400' height='400'></canvas>
     </div>
 
     <script>var $ = {};</script>
-    <script src='js/utils.js'></script>
-    <script>
-      var canvas   = document.getElementById('world');
-      var context  = this.canvas.getContext('2d');
-
-      // context.fillStyle = '#ddd';
-      // context.fillRect(100,100,50,50);
-      var last=0, delta=0;
-      var p1 = {
-        x: 150,
-        y: 330,
-        dy : 0
-      };
-      var p2 = {
-        x: 100,
-        y: 225,
-        dy : 0
-      }
-
-      function tick(timestamp) {
-        var drawStart = (timestamp || 0);
-        if(last === 0) {
-          last = drawStart;
-        }
-        // console.log('[%s - %s]', drawStart, this.time.last)
-        delta = drawStart - last;
-        
-        if(delta > 50) {
-          delta = 50;
-        }
-        p1.dy += delta/10;
-        p1.dy %= 100;
-
-        p2.dy += delta/10;
-        p2.dy %= 100;
-
-        var ds = Math.sin(last/200),
-            dc = Math.cos(last/200);
-        
-        var ex = 150 + ds*100;
-
-        context.clearRect(0,0,800,450);
-        context.beginPath();
-        context.moveTo(150, 400);
-        context.bezierCurveTo(p1.x + ds*50, p1.y , p2.x + dc*50, p2.y, ex, 175);
-        context.bezierCurveTo(p2.x +dc*50, p2.y, p1.x + ds*50 +100, p1.y, 250, 400);
-        // context.moveTo(150, 400);
-        context.strokeStyle = "#000";
-        context.stroke();
-        context.lineTo(150,400);
-        // context.bezierCurveTo(p1.x + ds*50 +100, p1.y , p2.x +dc*50, p2.y, ex, 175);
-        context.closePath();
-        // context.lineWidth = 1;
-        context.fillStyle = 'rgba(255,255,255,0.5)';
-        context.fill();
-
-        context.save();
-          // ctx.fillStyle = "rgba(110,179,56,0.5)";
-          context.fillStyle = "rgba(18,51,64, 0.95)";
-          context.beginPath();
-          context.arc(400, 300, 50, 0 , 2 * Math.PI, false);
-          context.closePath();
-          context.fill();
-        context.restore();
-        
-        last = drawStart;
-        requestAnimationFrame(tick);  
-      }
-
-      tick();
-    </script>
+    <script src='../js/utils.js'></script>
+    <script src='fluid.js'></script>
   </body>
 </html>
 

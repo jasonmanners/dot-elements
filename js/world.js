@@ -54,6 +54,30 @@ $.World.prototype = {
     ********************************************/
   },
 
+  setDay : function() {
+    this.backdrop = this.day;
+  },
+
+  setNight : function() {
+    this.backdrop = this.night;
+  },
+
+  isDay : function() {
+    return this.backdrop === this.day;
+  },
+
+  isNight : function() {
+    return this.backdrop === this.night;
+  },
+
+  findFloor: function(col) {
+    for(var i = 0; i < this.tiles[col].length; i++) {
+      if(this.tiles[col][i] !== null && this.tiles[col][i].solid) {
+        return this.tiles[col][i];
+      }
+    }
+  },
+
   applyPeaks : function(arr, start, end, size, times) {
     // console.log('PEAKS %s', times)
     var mid = Math.floor((end - start) / 2) + start;
@@ -86,12 +110,9 @@ $.World.prototype = {
 
   },
 
-  generateBackdrop : function() {
+  generateDay : function() {
     var w = $.const.WIDTH,
         h = $.const.HEIGHT;
-
-
-
 
     var canvas  = document.createElement("canvas"),
         ctx     = canvas.getContext("2d");
@@ -111,8 +132,35 @@ $.World.prototype = {
       ctx.drawImage(this.generateMountainScape(), 0, 0, w, h);
     ctx.restore();
 
+    return canvas;
+  },
 
-    this.backdrop = canvas;
+  generateNight : function() {
+    var w = $.const.WIDTH,
+        h = $.const.HEIGHT;
+
+    var canvas  = document.createElement("canvas"),
+        ctx     = canvas.getContext("2d");
+
+    canvas.width  = w;
+    canvas.height = h;
+          
+    ctx.save();
+      ctx.rect(0,0,w,h);
+      var gradient = ctx.createLinearGradient(0,h,0,0);
+      gradient.addColorStop(0, '#112233');   
+      gradient.addColorStop(1, '#000000');   
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    ctx.restore();
+
+    return canvas;
+  },
+
+  generateBackdrop : function() {
+    this.day = this.generateDay();
+    this.night = this.generateNight();
+    this.backdrop = this.day;
   },
 
   /* 
@@ -142,7 +190,7 @@ $.World.prototype = {
       ctx.lineTo(100,25);
       ctx.lineTo(0,25);
       ctx.closePath();
-      ctx.fillStyle = 'rgb(137,97,67)';
+      ctx.fillStyle = 'rgb(100,80,60)';
       ctx.fill();
     ctx.restore();
     // Clouds
@@ -169,11 +217,13 @@ $.World.prototype = {
   draw : function(ctx, camera) {
     var left  = Math.floor(camera.offset.x / $.const.TILE_SIZE),
         right = Math.floor((camera.offset.x + camera.viewWidth) / $.const.TILE_SIZE);
+    left = Math.max(5, left);
+    right = Math.min(right, right+6);
     for(var i = left-5; i < right+5; i++) {
       var row = this.tiles[i];
       var light = 1.0;
       for(var j = 0; j < row.length; j++) {
-        if(row[j] !== null){
+        if(row[j] !== null && row[j].solid){
 
           // row[j].image = $.utils.getRandom(this.tileImages[0][light.toFixed(1)]);
           row[j].draw(ctx, row[j].image[light.toFixed(1)]);

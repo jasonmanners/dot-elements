@@ -5,6 +5,7 @@ $.Camera = function() {
   };
 
   this.viewWidth  = 0;
+  this.viewHeight  = 450;
   this.gutter     = 0;
 };
 
@@ -26,6 +27,13 @@ $.Camera.prototype = {
     else if(pos.x < this.absoluteLeft()) {
       this.offset.x -= this.absoluteLeft() - pos.x;
     }
+
+    if(pos.y > this.absoluteBottom()) {
+      this.offset.y += pos.y - this.absoluteBottom();
+    }
+    else if(pos.y < this.absoluteTop()) {
+      this.offset.y -= this.absoluteTop() -  pos.y;
+    }
   },
 
   absoluteRight : function() {
@@ -34,5 +42,13 @@ $.Camera.prototype = {
 
   absoluteLeft : function() {
     return this.offset.x + this.gutter;
+  },
+
+  absoluteTop : function() {
+    return this.offset.y + this.gutter;
+  },
+
+  absoluteBottom : function() {
+    return (this.viewHeight - this.gutter) + this.offset.y;
   }
 };

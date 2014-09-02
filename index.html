@@ -2,6 +2,9 @@
 <html>
   <head>
     <style>
+      * {
+        font-family: arial;
+      }
       body {
         background: #444;
       }
@@ -11,6 +14,7 @@
       }
 
       .game-container {
+        border: 6px solid #FEFEFE;
         width: 800px;
         height: 450px;
         margin: 100px auto;
@@ -18,7 +22,6 @@
       }
 
       #world {
-        border: 6px solid #FEFEFE;
         width: 800px;
         height: 450px;
         background: #74B4DF;
@@ -46,11 +49,41 @@
         color: #FEFEFE;
         font-family: arial;
       }
+
+      #pause-pane {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        background: rgba(0,0,0,0.5);
+      }
+
+      #start {
+        background: rgba(28, 216, 94, 1.0);
+        border-radius: 5px;
+        border: 2px solid rgba(14, 108, 46, 1.0);
+        color: #FEFEFE;
+        text-align: center;
+        font-size: 18px;
+        width: 100px;
+        padding: 10px;
+        margin: 200px auto;
+        cursor: pointer;
+      }
+
+      #start:hover {
+        background: rgba(14, 208, 46, 1.0);
+      }
     </style>
   </head>
   <body>
     <div class='container'>
       <div class='game-container'>
+        <div id='pause-pane'>
+          <div id='start'>Start</div>
+        </div>
         <div id='dirt'><div id='dirt-num'>0</div></div>
         <canvas id='world' width='800' height='450'></canvas>
       </div>
@@ -59,8 +92,12 @@
     <script>var $ = {};</script>
     <script src='js/utils.js'></script>
     <script src='js/hero.js'></script>
+    <script src='js/enemy.js'></script>
     <script src='js/particle.js'></script>
+    <script src='js/shrine.js'></script>
     <script src='js/tile.js'></script>
+    <script src='js/animation.js'></script>
+    <script src='js/sprite.js'></script>
     <script src='js/camera.js'></script>
     <script src='js/game.js'></script>
     <script src='js/world.js'></script>
