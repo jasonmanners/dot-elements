@@ -42,12 +42,12 @@ var y           = [];
 var y0          = [];
 var prevDensity = [];
 
-init2D(density, 40);
-init2D(x, 40);
-init2D(y, 40);
-init2D(prevDensity, 40);
-init2D(x0, 40);
-init2D(y0, 40);
+init2D(density, 80);
+init2D(x, 80);
+init2D(y, 80);
+init2D(prevDensity, 80);
+init2D(x0, 80);
+init2D(y0, 80);
 // init2D(prevDensity, 40);
 // fluid[19][38].density += 0.8;
 // fluid[20][38].density += 0.8;
@@ -172,11 +172,11 @@ function density_step(step) {
   //   }
   // }
   if(mousedown)
-    density[Math.floor(mouse.x/10)][Math.floor(mouse.y/10)] += 10000 * step;
+    density[Math.floor(mouse.x/5)][Math.floor(mouse.y/5)] += 1000 * step;
   // prevDensity = copy(density);
   swap(density, prevDensity);
   // diffuse(density, prevDensity, step, 0.001, 0);
-  diffuse(density, prevDensity, step, 0.001, 0);
+  diffuse(density, prevDensity, step, 0.00025, 0);
   swap(density, prevDensity);
   advect(density, prevDensity, x, y, step, 0);
 }
@@ -186,16 +186,16 @@ function velocity_step(step) {
   //   x[i][38] += step * 1.0;
   //   y[i][38] += step * 60;
   // }
-  x[Math.floor(mouse.x/10)][Math.floor(mouse.y/10)] += 100 * step;
-  y[Math.floor(mouse.x/10)][Math.floor(mouse.y/10)] += 150 * step;
+  x[Math.floor(mouse.x/5)][Math.floor(mouse.y/5)] += 100 * step;
+  y[Math.floor(mouse.x/5)][Math.floor(mouse.y/5)] += 150 * step;
   // console.log(y[Math.floor(mouse.x/10)])
   // x0 = copy(x);
   // y0 = copy(y);
   swap(x, x0);
   swap(y, y0);
 
-  diffuse(x, x0, step, 0.001, 1);
-  diffuse(y, y0, step, 0.001, 2);
+  diffuse(x, x0, step, 0.01, 1);
+  diffuse(y, y0, step, 0.01, 2);
   project(x, y, x0, y0);
 
   // x0 = copy(x);
@@ -279,11 +279,11 @@ function tick(timestamp) {
       // }
       var dens = density[i][j] || 0;
       dens = Number(dens.toFixed(2));
-      dens = dens > 0.2 ?dens+0.5 : dens > 0.1 ? dens + 0.2 : dens;
+      dens = dens > 0.2 ? dens+0.5 : dens > 0.1 ? dens + 0.2 : dens;
       
       context.save();
-        var _x = i*10+xoffset;
-        var _y = j*10+yoffset;
+        var _x = i*5+xoffset;
+        var _y = j*5+yoffset;
         
         context.fillStyle = "rgba(255,255,255,"+dens+")";
         if(dens > 0.5) {
@@ -293,11 +293,11 @@ function tick(timestamp) {
           // context.closePath();
           // context.fill();
           context.fillStyle = "rgba(255,0,0,"+dens+")";
-          context.fillRect(_x,_y,10,10);  
+          context.fillRect(_x,_y,5,5);  
         }
         else {
           
-          context.fillRect(_x,_y,10,10);  
+          context.fillRect(_x,_y,5,5);  
         }
         
         
@@ -309,8 +309,8 @@ function tick(timestamp) {
       // context.restore();
       context.save();
         context.beginPath();
-        context.moveTo(i*10+5, j*10+5);
-        context.lineTo(i*10+x[i][j]+5, j*10+y[i][j]+5);
+        context.moveTo(i*5+5, j*5+5);
+        context.lineTo(i*5+x[i][j]+5, j*5+y[i][j]+5);
         context.closePath();
         context.strokeStyle = '#FFF';
         context.stroke();

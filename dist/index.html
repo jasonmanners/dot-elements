@@ -2,26 +2,304 @@
 <html>
   <head>
     <style>
+      * {
+        font-family: arial;
+      }
       body {
         background: #444;
       }
 
       .container {
-        width: 800px;
-        margin: 100px auto;
+        width: 100%;
       }
 
-      #world {
+      .game-container {
         border: 6px solid #FEFEFE;
         width: 800px;
         height: 450px;
+        margin: 100px auto;
+        position:relative;
+      }
+
+      #world {
+        width: 800px;
+        height: 450px;
         background: #74B4DF;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      ul, li {
+        list-style: none;
+      }
+
+
+      #ui {
+        position: absolute;
+        top     : 0;
+        left    : 0;
+        bottom  : 0;
+        right   : 0;
+        display: none;
+      }
+
+      #quick-slots {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+      }
+
+      #lives {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        z-index: 100;
+      }
+
+      #lives li {
+        float: left;
+      }
+
+      #quick-slots li {
+        float: left;
+        margin-right: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+        /*background: rgba(153,107,73,1);*/
+        /*background: #2828E4;*/
+        background: rgba(0,91,115, 0.8);
+        /*border: 2px solid #112233;*/
+        border: 2px solid rgb(15,208,219);
+        position:relative;
+        z-index: 101;
+        font-size:14px;
+
+       -moz-user-select: -moz-none;
+       -khtml-user-select: none;
+       -webkit-user-select: none;
+
+       /*
+         Introduced in IE 10.
+         See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+       */
+       -ms-user-select: none;
+       user-select: none;
+      }
+
+      #quick-slots li .qty {
+        position: absolute;
+        bottom:0;
+        right:0;
+        color: #FEFEFE;
+        font-family: arial;
+      }
+
+      #quick-slots li img {
+        width: 15px;
+        margin: 5px auto;
+        display: block;
+      }
+
+      #dirt-num {
+        position: absolute;
+        right: 5px;
+        bottom:5px;
+        color: #FEFEFE;
+        font-family: arial;
+      }
+
+      #pause-pane {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 200;
+        background: rgba(0,0,0,0.5);
+      }
+
+      #start, #died, #win {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        color: #FEFEFE;
+      }
+
+      #died, #win {
+        display: none;
+      }
+
+      #died h1 {
+        margin-top: 100px;
+        text-align: center;
+      }
+
+      #start h1 {
+        text-align: center;
+      }
+
+      #win {
+        text-align: center;
+        color: #FEFEFE;
+        padding: 100px 100px 0 100px;
+      }
+
+      #controls {
+        margin-left:15px;
+        float: left;
+        border : 1px solid #fff;
+        width: 350px;
+        height: 250px;
+      }
+
+      #controls h2 {
+        text-align: center;
+      }
+
+      #story {
+        float: left;
+        margin-left:65px;
+        border : 1px solid #fff;
+        width: 350px;
+        height: 250px;
+      }
+
+      #story:after {
+        clear: both;
+      }
+
+      #start-btn, #respawn-btn, #restart-btn {
+        background: rgba(28, 216, 94, 1.0);
+        border-radius: 5px;
+        border: 2px solid rgba(14, 108, 46, 1.0);
+        color: #FEFEFE;
+        text-align: center;
+        font-size: 18px;
+        width: 100px;
+        padding: 10px;
+        margin: 300px auto;
+        cursor: pointer;
+      }
+
+      #respawn-btn {
+        margin-top: 200px;
+        width: 200px;
+      }
+
+      #restart-btn {
+        margin-top: 100px;
+        width: 200px;
+      }
+
+      #start-btn:hover, #respawn-btn:hover, #restart-btn:hover {
+        background: rgba(14, 208, 46, 1.0);
+      }
+
+      .map {
+        border: 2px solid #182419;
+      }
+
+      .heart {
+        position: relative;
+        width: 30px;
+        height: 25px;
+      }
+      .heart:before,
+      .heart:after {
+        position: absolute;
+        content: "";
+        left: 15px;
+        top: 0;
+        width: 15px;
+        height: 24px;
+        background: red;
+        -moz-border-radius: 50px 50px 0 0;
+        border-radius: 50px 50px 0 0;
+        -webkit-transform: rotate(-45deg);
+           -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+             -o-transform: rotate(-45deg);
+                transform: rotate(-45deg);
+        -webkit-transform-origin: 0 100%;
+           -moz-transform-origin: 0 100%;
+            -ms-transform-origin: 0 100%;
+             -o-transform-origin: 0 100%;
+                transform-origin: 0 100%;
+      }
+      .heart:after {
+        left: 0;
+        -webkit-transform: rotate(45deg);
+           -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+             -o-transform: rotate(45deg);
+                transform: rotate(45deg);
+        -webkit-transform-origin: 100% 100%;
+           -moz-transform-origin: 100% 100%;
+            -ms-transform-origin: 100% 100%;
+             -o-transform-origin: 100% 100%;
+                transform-origin :100% 100%;
       }
     </style>
   </head>
   <body>
     <div class='container'>
-      <canvas id='world' width='800' height='450'></canvas>
+      <div class='game-container'>
+        <div id='pause-pane'>
+          <div id='pause'>
+          </div>
+          <div id='start'>
+            <h1>dotElements</h1>
+            <div id='controls'>
+              <h2>Controls</h2>
+              <ul>
+                <li><strong>a</strong> : Go Left</li>
+                <li><strong>d</strong> : Go Right</li>
+                <li><strong>space</strong> : Jump</li>
+                <li><strong>`</strong> : Go Home, 10sec cooldown</li>
+                <li><strong>1</strong> : Extract Blocks</li>
+                <li><strong>2</strong> : Build Blocks, Must fine the earth shrine</li>
+                <li><strong>3</strong> : Fireball, must find the fire shrine</li>
+                <li><strong>esc</strong> : Deselect ability/Pause</li>
+                <li><strong>p</strong> : Pause</li>
+              </ul>
+            </div>
+            <div id='story'>
+              
+            </div>
+            <div id='start-btn'>Lets Begin</div>
+          </div>
+          <div id='died'>
+            <h1>Your outards have become your innards...</h1>
+            <div id='respawn-btn'>Let's Try Again</div>
+          </div>
+          <div id='win'>
+            <h1>You have done it!</h1>
+            <p>You have defeated the blight</p>
+            <p>Count yourself among the few who have survived and triumphed</p>
+            <div id='restart-btn'>Let's Try Again</div>
+          </div>
+        </div>
+        <div id='ui'>
+          <ul id='quick-slots'>
+            <li id='slot-1'><img id='slot-1-preview'></img><div class='qty' id='slot-1-qty'></div></li>
+            <li id='slot-2'><img id='slot-2-preview'></img><div class='qty' id='slot-2-qty'></div></li>
+            <li id='slot-3'><img id='slot-3-preview'></img><div class='qty' id='slot-3-qty'></div></li>
+            <li id='slot-4'><img id='slot-4-preview'></img><div class='qty' id='slot-4-qty'></div></li>
+            <li id='slot-5'><img id='slot-5-preview'></img><div class='qty' id='slot-5-qty'></div></li>
+          </ul>
+
+
+          <ul id='lives'>
+            <li><div class='heart'></div></li>
+          </ul>
+        </div>
+        <canvas id='world' width='800' height='450'></canvas>
+      </div>
     </div>
 
     <script>var $ = {};</script>

@@ -16,7 +16,7 @@ $.Tile = {
           image[ls.toFixed(1)] = lcanvas;
         }
 
-        images.push(image)
+        images.push(image);
       }
       $.Tile.images[$.const.COLORS[i].name] = images;
     }
@@ -86,7 +86,7 @@ $.Tile = {
       lh = 4; //Math.floor(Math.random()*5);
       x = Math.floor(Math.random()*(w-4))+4;
       y = Math.floor(Math.random()*(h-4))+4;
-      ctx.fillStyle = $.utils.colorString(color.r*.9, color.g*.9, color.b*.9, color.a);
+      ctx.fillStyle = $.utils.colorString(color.r*0.9, color.g*0.9, color.b*0.9, color.a);
       ctx.fillRect(x,y,lw,lh);
     ctx.restore();
     ctx.save();
@@ -102,7 +102,7 @@ $.Tile = {
       lh = 4; //Math.floor(Math.random()*5);
       x = Math.floor(Math.random()*(w-4))+4;
       y = Math.floor(Math.random()*(h-4))+4;
-      ctx.fillStyle = $.utils.colorString(color.r*.7, color.g*.7, color.b*.7, color.a);
+      ctx.fillStyle = $.utils.colorString(color.r*0.7, color.g*0.7, color.b*0.7, color.a);
       ctx.fillRect(x,y,lw,lh);
     ctx.restore();
 

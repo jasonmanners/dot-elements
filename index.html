@@ -30,16 +30,77 @@
         left: 0;
       }
 
-      #dirt {
+      ul, li {
+        list-style: none;
+      }
+
+
+      #ui {
+        position: absolute;
+        top     : 0;
+        left    : 0;
+        bottom  : 0;
+        right   : 0;
+        display: none;
+      }
+
+      #quick-slots {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+      }
+
+      #lives {
+        position: absolute;
+        top: 0;
+        right: 10px;
+        z-index: 100;
+      }
+
+      #lives li {
+        float: left;
+      }
+
+      #quick-slots li {
+        float: left;
+        margin-right: 10px;
         width: 30px;
         height: 30px;
         border-radius: 5px;
-        background: rgba(153,107,73,1);
-        border: 2px solid #112233;
+        /*background: rgba(153,107,73,1);*/
+        /*background: #2828E4;*/
+        background: rgba(0,91,115, 0.8);
+        /*border: 2px solid #112233;*/
+        border: 2px solid rgb(15,208,219);
+        position:relative;
+        z-index: 101;
+        font-size:14px;
+
+       -moz-user-select: -moz-none;
+       -khtml-user-select: none;
+       -webkit-user-select: none;
+
+       /*
+         Introduced in IE 10.
+         See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+       */
+       -ms-user-select: none;
+       user-select: none;
+      }
+
+      #quick-slots li .qty {
         position: absolute;
-        top: 15px;
-        left: 15px;
-        z-index: 10;
+        bottom:0;
+        right:0;
+        color: #FEFEFE;
+        font-family: arial;
+      }
+
+      #quick-slots li img {
+        width: 15px;
+        margin: 5px auto;
+        display: block;
       }
 
       #dirt-num {
@@ -56,11 +117,66 @@
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 100;
+        z-index: 200;
         background: rgba(0,0,0,0.5);
       }
 
-      #start {
+      #start, #died, #win {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        color: #FEFEFE;
+      }
+
+      #died, #win {
+        display: none;
+      }
+
+      #died h1 {
+        margin-top: 100px;
+        text-align: center;
+      }
+
+      #start h1 {
+        text-align: center;
+      }
+
+      #win {
+        text-align: center;
+        color: #FEFEFE;
+        padding: 100px 100px 0 100px;
+      }
+
+      #controls {
+        margin-left:15px;
+        float: left;
+        /*border : 1px solid #fff;*/
+        width: 350px;
+        height: 250px;
+      }
+
+      #controls h2 {
+        border-bottom: 1px solid #ddd;
+        margin-top    : 5px;
+        margin-bottom : 5px;
+        /*text-align: center;*/
+      }
+
+      #story {
+        float: left;
+        margin-left:65px;
+        border : 1px solid #fff;
+        width: 350px;
+        height: 250px;
+      }
+
+      #story:after {
+        clear: both;
+      }
+
+      #start-btn, #respawn-btn, #restart-btn {
         background: rgba(28, 216, 94, 1.0);
         border-radius: 5px;
         border: 2px solid rgba(14, 108, 46, 1.0);
@@ -69,12 +185,67 @@
         font-size: 18px;
         width: 100px;
         padding: 10px;
-        margin: 200px auto;
+        margin: 300px auto;
         cursor: pointer;
       }
 
-      #start:hover {
+      #respawn-btn {
+        margin-top: 200px;
+        width: 200px;
+      }
+
+      #restart-btn {
+        margin-top: 100px;
+        width: 200px;
+      }
+
+      #start-btn:hover, #respawn-btn:hover, #restart-btn:hover {
         background: rgba(14, 208, 46, 1.0);
+      }
+
+      .map {
+        border: 2px solid #182419;
+      }
+
+      .heart {
+        position: relative;
+        width: 24px;
+        height: 20px;
+      }
+      .heart:before,
+      .heart:after {
+        position: absolute;
+        content: "";
+        left: 12px;
+        top: 0;
+        width: 12px;
+        height: 20px;
+        background: red;
+        -moz-border-radius: 50px 50px 0 0;
+        border-radius: 50px 50px 0 0;
+        -webkit-transform: rotate(-45deg);
+           -moz-transform: rotate(-45deg);
+            -ms-transform: rotate(-45deg);
+             -o-transform: rotate(-45deg);
+                transform: rotate(-45deg);
+        -webkit-transform-origin: 0 100%;
+           -moz-transform-origin: 0 100%;
+            -ms-transform-origin: 0 100%;
+             -o-transform-origin: 0 100%;
+                transform-origin: 0 100%;
+      }
+      .heart:after {
+        left: 0;
+        -webkit-transform: rotate(45deg);
+           -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+             -o-transform: rotate(45deg);
+                transform: rotate(45deg);
+        -webkit-transform-origin: 100% 100%;
+           -moz-transform-origin: 100% 100%;
+            -ms-transform-origin: 100% 100%;
+             -o-transform-origin: 100% 100%;
+                transform-origin :100% 100%;
       }
     </style>
   </head>
@@ -82,14 +253,82 @@
     <div class='container'>
       <div class='game-container'>
         <div id='pause-pane'>
-          <div id='start'>Start</div>
+          <div id='pause'>
+          </div>
+          <div id='start'>
+            <h1>dotElements</h1>
+            <div id='controls'>
+              <h2>Controls</h2>
+                <table>
+                  <tr>
+                    <td><strong>a</strong></td><td>Left</td>
+                  </tr>
+                  <tr>
+                    <td><strong>d</strong></td><td>Right</td>
+                  </tr>
+                  <tr>
+                    <td><strong>space</strong></td><td>Jump</td>
+                  </tr>
+                  <tr>
+                    <td><strong>1</strong></td><td>Go Home, 10sec cooldown</td>
+                  </tr>
+                  <tr>
+                    <td><strong>2</strong></td><td>Extract Blocks</td>
+                  </tr>
+                  <tr>
+                    <td><strong>3</strong></td><td>Build Blocks, after finding Earth shrine</td>
+                  </tr>
+                  <tr>
+                    <td><strong>4</strong></td><td>Fireball, after finding Fire shrine</td>
+                  </tr>
+                  <tr>
+                    <td><strong>esc</strong></td><td>Deselect ability/Pause</td>
+                  </tr>
+                  <tr>
+                    <td><strong>p</strong></td><td>Pause</td>
+                  </tr>
+                  <tr>
+                    <td><strong>click</strong></td><td>Use Earth and Fire powers</td>
+                  </tr>
+                </table>
+            </div>
+            <div id='story'>
+              
+            </div>
+            <div id='start-btn'>Lets Begin</div>
+          </div>
+          <div id='died'>
+            <h1>Your outards have become your innards...</h1>
+            <div id='respawn-btn'>Let's Try Again</div>
+          </div>
+          <div id='win'>
+            <h1>You have done it!</h1>
+            <p>You have defeated the blight</p>
+            <p>Count yourself among the few who have survived and triumphed</p>
+            <div id='restart-btn'>Let's Try Again</div>
+          </div>
         </div>
-        <div id='dirt'><div id='dirt-num'>0</div></div>
+        <div id='ui'>
+          <ul id='quick-slots'>
+            <li id='slot-1'><img id='slot-1-preview'></img><div class='qty' id='slot-1-qty'></div></li>
+            <li id='slot-2'><img id='slot-2-preview'></img><div class='qty' id='slot-2-qty'></div></li>
+            <li id='slot-3'><img id='slot-3-preview'></img><div class='qty' id='slot-3-qty'></div></li>
+            <li id='slot-4'><img id='slot-4-preview'></img><div class='qty' id='slot-4-qty'></div></li>
+            <!-- <li id='slot-5'><img id='slot-5-preview'></img><div class='qty' id='slot-5-qty'></div></li> -->
+          </ul>
+
+
+          <ul id='lives'>
+            <li><div class='heart'></div></li>
+            <li><div id='health'>10</div></li>
+          </ul>
+        </div>
         <canvas id='world' width='800' height='450'></canvas>
       </div>
     </div>
 
     <script>var $ = {};</script>
+    <script src='js/jsfxr.js'></script>
     <script src='js/utils.js'></script>
     <script src='js/hero.js'></script>
     <script src='js/enemy.js'></script>

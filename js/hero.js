@@ -3,6 +3,11 @@ $.Hero = function() {
     x : 0,
     y : 0
   };
+
+  this.startPos = {
+    x : 0,
+    y : 0
+  };
   
   this.vel = {
     x   : 0,
@@ -30,7 +35,7 @@ $.Hero = function() {
   this.dir = 1;
 
   this.powers    = [];
-  this.health    = 100;
+  this.health    = 50;
 
   this.jumpCounter = 0;
 
@@ -44,7 +49,24 @@ $.Hero = function() {
     dirt : 0
   };
 
-
+  this.timings = {
+    mining : {
+      current : 0,
+      threshold : 250
+    },
+    shooting : {
+      current   : 0,
+      threshold : 500
+    },
+    damage : {
+      current   : 0,
+      threshold : 250
+    },
+    returnHome : {
+      current   : 30001,
+      threshold : 30000
+    }
+  };
   this.time = 0;
   // this.img = new Image();
   // this.img.src = 'img/running.png';
@@ -78,7 +100,7 @@ $.Hero = function() {
     x : 7.5,
     y : 17.5
   });
-  foot.name = 'foot'
+  foot.name = 'foot';
   foot.draw = function(ctx) {
     // ctx.save();
     //   ctx.beginPath();
@@ -135,19 +157,44 @@ $.Hero = function() {
   this.sprite.animations.right_run  = right_run;
   this.sprite.currentAnimation = this.sprite.animations.idle;
 
+  this.emitter = new $.Emitter();
+
 };
 
 $.Hero.prototype = {
   
   win : function() {
-    return this.shrines === 1;
+    return this.shrines === 4;
+  },
+
+  lose : function() {
+    return this.health <= 0;
+  },
+
+  takeDamage : function(dmg) {
+    if(this.canTakeAction('damage')) {
+      this.timings.damage.current = 0;
+      this.health -= dmg;
+    }
+  },
+
+  returnHome : function() {
+    if(this.timings.returnHome.current > this.timings.returnHome.threshold) {
+      this.pos.x = this.startPos.x;
+      this.pos.y = this.startPos.y;
+      this.timings.returnHome.current = 0;
+    }
+  },
+
+  canTakeAction : function(action) {
+    return this.timings[action].current > this.timings[action].threshold;
   },
 
   getCenter : function() {
     return {
       x: this.pos.x + (this.width/2),
       y: this.pos.y + (this.height/2)
-    }
+    };
   },
 
   setMode : function(mode) {
@@ -161,27 +208,52 @@ $.Hero.prototype = {
 
     
     if(this.mode & 1 && tiles[x][y] !== null && this.withinRange(mouse)) {
-      tiles[x][y] = null;
-      this.inventory.dirt++;
+      if(this.timings.mining.current > this.timings.mining.threshold) {
+        tiles[x][y] = null;
+        this.inventory.dirt++;
 
-      $.ParticleEmitter.addParticle({x: mouse.x, y: mouse.y}, 200, Math.PI, {r: 255, g: 255, b: 255, a: 0.5});
+
+        for(var z = 0; z < 10; z++) {
+          $.ParticleEmitter.add.dirt($.utils.deepCopy(mouse), 200*Math.random() + 100, Math.PI*4/3 - Math.PI*Math.random()*2/3);
+        }
+        this.timings.mining.current = 0;
+      }
     }
     else if(this.mode >> 1 & 1 && this.inventory.dirt > 0 && this.withinRange(mouse)) {
       if(tiles[x][y] === null) {
         tiles[x][y] = new $.Tile.Dirt({x: x*$.const.TILE_SIZE, y: y*$.const.TILE_SIZE});
         this.inventory.dirt--;
-
       }
     }
     else if(this.mode >> 2 & 1) {
-      console.log('FIRE', this.mode)
-      var dir = 1;
-      if(this.pos.x > mouse.x) {
-        dir = -1;
+      if(this.timings.shooting.current > this.timings.shooting.threshold) {
+        var dir = 1;
+        if(this.pos.x > mouse.x) {
+          dir = -1;
+        }
+
+        var dx = mouse.x - this.pos.x;
+        var dy = mouse.y - this.pos.y;
+
+        dir = Math.atan2(-dy, dx) + Math.PI*0.5;
+        // if(dir < 0) {
+        //   dir += 2 * Math.PI;
+        // }
+        // var soundURL = jsfxr([0,,0.1753,,0.0941,0.6039,0.0981,-0.4154,,,,,,0.4342,0.1938,,,,1,,,,,0.5]);
+        // var player = new Audio();
+        // player.src = soundURL;
+        // player.play();
+        // player.addEventListener('ended', function(){
+        //   console.log('jump ended')
+        // })
+
+        var part = $.ParticleEmitter.add.fireball($.utils.deepCopy(this.pos), 800, dir );
+        part.solid = true;
+        this.timings.shooting.current = 0;
+
       }
-      $.ParticleEmitter.addParticle($.utils.deepCopy(this.pos), 200, dir * Math.PI/2, {r: 255, g: 255, b: 255, a: 0.5});
     }
-    document.getElementById('dirt-num').innerHTML = this.inventory.dirt;
+    document.getElementById('slot-3-qty').innerHTML = this.inventory.dirt;
   },
 
   withinRange : function(mouse) {
@@ -210,69 +282,23 @@ $.Hero.prototype = {
     this.pos[direction] += units;
   },
 
-  handleCollision : function(pos, size, i, j) {
-    // This will need to handle Tops && Caves
-    var hlx = this.pos.x,
-        hrx = this.pos.x + this.width,
-        hty = this.pos.y,
-        hby = this.pos.y + this.height,
-        hcx = this.pos.x + this.width / 2,
-        hcy = this.pos.y + this.height / 2;
-
-    var plx = pos.x,
-        prx = pos.x + size,
-        pty = pos.y,
-        pby = pos.y + size,
-        pcx = pos.x + size/2,
-        pcy = pos.y + size/2;
-
-    
-    //top
-    if(hty < pby && hty > pty && this.vel.y < 0 && Math.abs(hcx - pcx) < size/2) {
-      // console.log('TOP');
-      this.pos.y = pby;
-      this.acc.y = 0;
-      this.vel.y = 0;
-      return true;
-    }
-    // Bottom
-    if(hby > pty && hby < pby && Math.abs(hcx - pcx) < size/2) {
-      // console.log('BOTTOM');
-      this.pos.y = pty-this.height;
-      this.acc.y = 0;
-      this.vel.y = 0;
-      this.jumpCounter = 0;
-      // debugger;
-      return true;
-    }
-
-    // LEFT
-    if(hlx < prx && hlx > plx && $.utils.toIndex(hty, size) === $.utils.toIndex(pty, size)) {
-      // console.log('LEFT');
-      this.pos.x = prx;
-      // this.acc.x = 0;
-      this.vel.x = 0;
-    }
-    // Right
-    else if(hrx > plx && hrx < prx && $.utils.toIndex(hty, size) === $.utils.toIndex(pty, size)) {
-      // console.log('RIGHT');
-      this.pos.x = plx - this.width;
-      // this.acc.x = 0;
-      this.vel.x = 0;
-    }
-
-    return false;
-  },
-
   jump : function() {
     if(this.jumpCounter < 2){
       this.jumpCounter++;
       this.vel.y = -500;
+
+      // var soundURL = jsfxr([0,,0.105,,0.1803,0.3503,,0.2001,,,,,,0.3262,,,,,1,,,0.1502,,0.5]);
+      // var player = new Audio();
+      // player.src = soundURL;
+      // player.play();
     }
   },
 
   update : function(delta) {
     var step = delta/1000;
+
+    // this.emitter.update(delta, this.pos);
+
     this.vel.delta.x = this.dir * step * this.acc.x;
 
     if(Math.abs(this.vel.x + this.vel.delta.x) <= this.vel.max) {
@@ -300,6 +326,28 @@ $.Hero.prototype = {
     this.sprite.update(delta);
 
     this.time += delta;
+
+    document.getElementById('health').innerHTML = this.health;
+    this.updateTimings(delta);
+  },
+
+  updateTimings : function(delta) {
+    var timingKeys = Object.keys(this.timings),
+        i          = timingKeys.length; 
+
+    while(i--) {
+      var timing = this.timings[timingKeys[i]];
+      if(timing.current <= timing.threshold) {
+        timing.current += delta;
+      }
+    }
+
+    if(!this.canTakeAction('returnHome')) {
+      document.getElementById('slot-1-qty').innerHTML = Math.round((this.timings.returnHome.threshold - this.timings.returnHome.current)/1000);
+    }
+    else if(document.getElementById('slot-1-qty').innerHTML !== '') {
+      document.getElementById('slot-1-qty').innerHTML = '';
+    }
   },
 
   draw : function(ctx) {
